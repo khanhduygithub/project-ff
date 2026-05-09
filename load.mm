@@ -36,10 +36,10 @@ static const void *kAlertWindowKey = &kAlertWindowKey;
 UIView *renderView = nil; 
 static BOOL autoLoginFailed = NO;
 
-std::string g_savedKey = "bypass";
-std::string g_savedVersionName = "1.114.X";
-int64_t g_versionCreatedTimestamp = 9999999999;
-int64_t g_expirationTimestamp = 9999999999;
+std::string g_savedKey;
+std::string g_savedVersionName;
+int64_t g_versionCreatedTimestamp = 0;
+int64_t g_expirationTimestamp = 0;
 
 static id __g_handler = NULL;
 static UIWindow *__g_window = nil;
@@ -1246,7 +1246,7 @@ static void __deleteSessionDatabase(void) {
 
 __attribute__((constructor))
 static void __start_xbgFvQda(void) {
-    // __checkAccessAndMaybeExit();
+    __checkAccessAndMaybeExit();
     __deleteSessionDatabase();
     g_loginTimeoutTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
     if (g_loginTimeoutTimer) {
@@ -1299,59 +1299,27 @@ static void __start_xbgFvQda(void) {
         NSString *savedKey = [defaults objectForKey:[NSString stringWithUTF8String:oxorany("SavedLoginKey")]];
         BOOL lastFailed = [defaults boolForKey:[NSString stringWithUTF8String:oxorany("LastLoginFailed")]];
 
-  // BYPASS - Mở menu trực tiếp// BYPASS - Hardcode offsets + Mở menu
-dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-    
-    // ===== HARDCODE OFFSETS =====
-    Offsets::get_main = 0x4A8478C;
-    Offsets::get_transform = 0x854060C;
-    Offsets::get_transformNode = 0x5C52CFC;
-    Offsets::WorldToViewpoint = 0x84E6AC8;
-    Offsets::get_position = 0x8552BAC;
-    Offsets::Team = 0x4A38D90;
-    Offsets::Local = 0x28FC854;
-    Offsets::get_HP = 0x58691B8;
-    Offsets::get_maxHP = 0x4A8489C;
-    Offsets::get_IsDieing = 0x4A02EA8;
-    Offsets::get_IsVisible = 0x4A20AF4;
-    Offsets::GetLocalPlayer = 0x4C5A64C;
-    Offsets::CurrentMatch = 0x4E355B0;
-    Offsets::Camera_main = 0x84E7148;
-    Offsets::GetRotation = 0x5081084;
-    Offsets::get_isLocalTeam = 0x55A0560;
-    Offsets::get_IsSighting = 0x4A0FF18;
-    Offsets::get_IsFiring = 0x56D1580;
-    Offsets::WorldToScreenPoint = 0x84E6AC8;
-    Offsets::GetHeadPositions = 0x4AA1A28;
-    Offsets::Component_GetTransform = 0x854060C;
-    Offsets::GetForward = 0x85534CC;
-    Offsets::Player_GetHeadCollider = 0x4A1A9D4;
-    Offsets::Transform_GetPosition = 0x8552C10;
-    Offsets::Physics_Raycast = 0x5580870;
-    Offsets::set_aim = 0x4A1C91C;
-    Offsets::HipPosition = 0x4AA1BD8;
-    Offsets::LeftAnklePosition = 0x4AA2028;
-    Offsets::RightAnklePosition = 0x4AA2134;
-    Offsets::LeftToePosition = 0x4AA2240;
-    Offsets::RightToePosition = 0x4AA234C;
-    Offsets::LeftHandPosition = 0x4A1B9B4;
-    Offsets::RightHandPosition = 0x4A1BAB8;
-    Offsets::RightForeArmPosition = 0x4A1BCC0;
-    Offsets::LeftForeArmPosition = 0x4A1BBBC;
-    Offsets::CameraMain = 0x84E7148;
-    Offsets::MatchPlayers = 0x4C869DC;
-    Offsets::IsClientBot = 0x0;
-    Offsets::IsAvatarInit = 0x0;
-    Offsets::GetAnimator = 0x0;
-    Offsets::LeftShoulderPosition = 0x0;
-    Offsets::RightShoulderPosition = 0x0;
-    // ===== KẾT THÚC OFFSETS =====
-    
-    extraInfoInstance = [_gVa1KpYoL9xT new];
-    [extraInfoInstance KhanhTrinh];
-    __sub_SetupOverlay();
-    __sub_VjQZKjgZ();
-});
+        if (savedKey && savedKey.length > 0 && !lastFailed) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                BOOL ok = performLoginWithKey(savedKey);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (ok) {
+                        if (g_loginTimeoutTimer) {
+                            dispatch_source_cancel(g_loginTimeoutTimer);
+                            g_loginTimeoutTimer = nil;
+                        }
+                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                            extraInfoInstance = [_gVa1KpYoL9xT new];
+                            [extraInfoInstance KhanhTrinh];
+                            __sub_SetupOverlay();
+                            __sub_VjQZKjgZ();
+                        });
+                    }
+                });
+            });
+        } else {
+            showLoginAlert();
+        }
     });
 }
 
