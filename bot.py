@@ -13,14 +13,14 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 
 # Configuration
-TELEGRAM_TOKEN = "8627494594:AAEmrla3xxKj5TF48MAluv2_k6CbIbkJ4CQ"
+TELEGRAM_TOKEN = "7046635710:AAGT6TW0ooWtcGyd3e9QItPeOoELMqdO_ZA"
 THEOS_PATH = "/home/smartpepole/theos"
 WORK_DIR = "/tmp/theos_builds"
 MAX_CONCURRENT_BUILDS = 3
 BUILD_TIMEOUT = 900  # 15 minutes
 RATE_LIMIT_MINUTES = 1
 MAX_FILE_SIZE_MB = 100
-LOG_GROUP_ID = -5129947601  # Private group for logging all builds
+LOG_GROUP_ID = -1004402485784  # Private group for logging all builds
 
 # Setup logging
 logging.basicConfig(
